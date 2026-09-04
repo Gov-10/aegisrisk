@@ -1,8 +1,6 @@
 fastapi
 uvicorn
-python-dotenv
 sqlalchemy
 psycopg2-binary
-argon2-cffi
-redis
+python-dotenv
 PyJWT
