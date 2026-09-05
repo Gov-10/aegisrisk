@@ -1,0 +1,6 @@
+python-dotenv
+minio
+sqlalchemy
+psycopg2-binary
+matplotlib
+reportlab

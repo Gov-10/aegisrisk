@@ -6,7 +6,7 @@ from reportlab.lib import colors
 from minio import Minio
 from utils.calcu import calculate_stuff
 from datetime import datetime, timedelta
-from database import Audit, sessionLocal
+from database import Audit, sessionLocal, Reports
 from llama_cpp import Llama
 from dotenv import load_dotenv
 load_dotenv()
@@ -71,3 +71,10 @@ except Exception:
     pass #for now
 finally:
     pdf_buffer.close()
+db_note= Reports(filename=filename, timestamp=datetime.utcnow())
+db.add(db_note)
+try:
+    db.commit()
+except Exception:
+    db.rollback()
+db.refresh(db_note)
