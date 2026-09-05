@@ -18,3 +18,10 @@ class Audit(Base):
     res = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
+class Reports(Base):
+    __tablename__ = "reports"
+    id = Column(Integer, index=True, autoincrement=True, primary_key=True)
+    filename = Column(String, unique=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+Base.metadata.create_all(bind=engine)
