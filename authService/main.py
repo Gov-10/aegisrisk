@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from utils.otp_generator import gen_otp
 from utils.email_sender import email_send
 from sqlalchemy.sql import text
+from datetime import datetime, timedelta
 from argon2 import PasswordHasher
 ph = PasswordHasher()
 from argon2.exceptions import VerifyMismatchError
@@ -55,7 +57,7 @@ def crea(payload: schemas.RegisterSchema, db:Session=Depends(get_db)):
         raise HTTPException(status_code=500, detail="db error")
     db.refresh(db_note)
     verify_otp = gen_otp()
-    hashed = hashlib.sha256(otp.encode()).hexdigest()
+    hashed = hashlib.sha256(verify_otp.encode()).hexdigest()
     redis_client.setex(f"verify_otp:{email}", 600, hashed)
     email_send(email, verify_otp)
     return {"message": "verify your email"}
@@ -68,7 +70,7 @@ def veri(payload:schemas.VerifySchema, db:Session=Depends(get_db)):
     if not hashed:
         raise HTTPException(status_code=404, detail="not found")
     input_hash=hashlib.sha256(verify_otp.encode()).hexdigest()
-    if input_hash != stored:
+    if input_hash != hashed:
         raise HTTPException(status_code=401, detail="otp does not match")
     user = db.query(Users).filter(Users.email==email).first()
     if not user:
@@ -106,6 +108,8 @@ def logi(payload: schemas.LoginSchema, response:Response, db:Session=Depends(get
 def logo(request: Request, response: Response, db:Session=Depends(get_db)):
     session_token= request.cookies.get("session_token")
     if not session_token:
-        raise HTTPException(status_code=401, detaail="you are not logged in")
+        raise HTTPException(status_code=401, detail="you are not logged in")
     response.delete_cookie("session_token")
     return {"message": "logged out"}
+
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])

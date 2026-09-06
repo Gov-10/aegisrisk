@@ -1,3 +1,4 @@
 .env
+Phi-3-mini-4k-instruct.gguf
 venv/
 __pycache__/

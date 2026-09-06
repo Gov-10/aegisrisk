@@ -15,7 +15,7 @@ class Users(Base):
     email = Column(String)
     username= Column(String)
     password = Column(String)
-    iactive =Column(Boolean, default=False)
+    isactive =Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
